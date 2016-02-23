@@ -35,7 +35,8 @@ L.Control.FuseSearch = L.Control.extend({
         showResultFct: null,
         showInvisibleFeatures: true,
         ignoreOffset: false,
-        deferPopup: false
+        deferPopup: false,
+        delaySearch: null
     },
     
     initialize: function(options) {
@@ -135,9 +136,18 @@ L.Control.FuseSearch = L.Control.extend({
         this._input = L.DomUtil.create('input', 'search-input', header);
         this._input.maxLength = 30;
         this._input.placeholder = this.options.placeholder;
+        
+        // Delayed search
+        var delay = this.options.delaySearch || 0;
+        
         this._input.onkeyup = function(evt) {
             var searchString = evt.currentTarget.value;
-            _this.searchFeatures(searchString);
+            
+            if (_this._delayId) {
+              clearTimeout(_this._delayId);
+            }
+            
+            _this._delayId = setTimeout(function(){ _this.searchFeatures(searchString); }, delay);
         };
 
         // Close button
