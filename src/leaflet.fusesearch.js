@@ -34,7 +34,8 @@ L.Control.FuseSearch = L.Control.extend({
         maxResultLength: null,
         showResultFct: null,
         showInvisibleFeatures: true,
-        ignoreOffset: false
+        ignoreOffset: false,
+        deferPopup: false
     },
     
     initialize: function(options) {
@@ -260,16 +261,32 @@ L.Control.FuseSearch = L.Control.extend({
         var resultList = document.querySelector('.result-list');
         var num = 0;
         var max = this.options.maxResultLength;
+        var defer = this.options.deferPopup;
+        var showInvisible = this.options.showInvisibleFeatures;
         for (var i in result) {
             var props = result[i];
             var feature = props._feature;
-            var popup = this._getFeaturePopupIfVisible(feature);
+            var layer = feature.layer;
             
-            if (undefined !== popup || this.options.showInvisibleFeatures) {
-                this.createResultItem(props, resultList, popup);
-                if (undefined !== max && ++num === max)
-                    break;
+            if (layer === undefined) {
+              continue;
             }
+            
+            if (defer === true) {
+              if (this._map.hasLayer(layer) || showInvisible) {
+                this.createResultItem(props, resultList);
+                ++num;
+              }
+            } else {
+              var popup =  this._map.hasLayer(layer) ? layer.getPopup() : undefined;
+              if (undefined !== popup || showInvisible) {
+            		this.createResultItem(props, resultList, popup);
+            		++num;
+            	}
+            }
+            
+            if (undefined !== max && num === max)
+        			break;
         }
     },
     
@@ -277,13 +294,6 @@ L.Control.FuseSearch = L.Control.extend({
         // Reapply the search on the indexed features - useful if features have been filtered out
         if (this.isPanelVisible()) {
             this.searchFeatures(this._input.value);
-        }
-    },
-    
-    _getFeaturePopupIfVisible: function(feature) {
-        var layer = feature.layer;
-        if (undefined !== layer && this._map.hasLayer(layer)) {
-            return layer.getPopup();
         }
     },
     
@@ -306,6 +316,11 @@ L.Control.FuseSearch = L.Control.extend({
                     _this._panAndPopup(feature, popup);
                 }
             };
+        } else if (this.options.deferPopup === true) {
+          L.DomUtil.addClass(resultItem, 'clickable');
+          resultItem.onclick = function() {
+            _this.fire( 'fusesearchresultclick', { feature: feature } );
+          };
         }
 
         // Fill in the container with the user-supplied function if any,
