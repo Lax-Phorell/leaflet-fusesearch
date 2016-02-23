@@ -33,7 +33,8 @@ L.Control.FuseSearch = L.Control.extend({
         threshold: 0.5,
         maxResultLength: null,
         showResultFct: null,
-        showInvisibleFeatures: true
+        showInvisibleFeatures: true,
+        ignoreOffset: false
     },
     
     initialize: function(options) {
@@ -216,6 +217,9 @@ L.Control.FuseSearch = L.Control.extend({
     },
     
     getOffset: function() {
+        if (this.options.ignoreOffset) {
+          return 0;
+        }
         if (this._panelOnLeftSide) {
             return - this._panel.offsetWidth;
         } else {
