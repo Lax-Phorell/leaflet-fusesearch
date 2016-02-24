@@ -56,7 +56,11 @@ The FuseSearch control can be created with the following options :
         container.appendChild(document.createTextNode(props.details));
     }
 </pre>
-
+<ul>
+<li><code>ignoreOffset</code> : allows to open result list without moving the map. Default <code>false</code></li>
+<li><code>deferPopup</code> : allows to use deferred popup creation. Clickable results are created for features even if they do not yet have a popup. When clicking a 'deferred popup result', the plugin fires a 'fusesearchresultclick' event with the clicked feature attached to it. Default <code>false</code></li>
+<li><code>delaySearch</code> : the time to delay the search in MS after a user typed something in the search field. Default <code>null</code></li>
+</ul>
 In addition these options are directly passed to Fuse - more details on <a href="http://kiro.me/projects/fuse.html">Fuse.js</a> :
 <ul>
 <li><code>caseSensitive</code> : whether comparisons should be case sensitive, default is false</li>
