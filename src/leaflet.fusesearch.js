@@ -132,7 +132,7 @@ L.Control.FuseSearch = L.Control.extend({
         }
         
         // Search image and input field
-        L.DomUtil.create('img', 'search-image', header);
+        L.DomUtil.create('div', 'search-image', header);
         this._input = L.DomUtil.create('input', 'search-input', header);
         this._input.maxLength = 30;
         this._input.placeholder = this.options.placeholder;
